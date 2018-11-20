@@ -1,5 +1,5 @@
 from flask import Flask, request, session
-from conf import session_key
+from conf import session_key, db_user, db_pwd
 from pymongo import MongoClient
 from new_challenge import send_new_challenge
 from update_collections import new_users
@@ -7,7 +7,8 @@ from utils import update_flow_state, get_user, send_base_message, resp_message
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
-db = MongoClient('localhost', 27017)
+db = MongoClient('localhost', 27017,
+                 username=db_user, password=db_pwd, authSource='maintenant', authMechanism='SCRAM-SHA-256')
 
 sentry_sdk.init(
     dsn="https://361d7688867b44db99cd55f9b15333e3@sentry.io/1327058",
@@ -176,4 +177,4 @@ sms_dispatch = {
 }
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(host='0.0.0.0', port=80)

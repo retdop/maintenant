@@ -3,7 +3,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 from conf import account_sid, auth_token, from_number, db_user, db_pwd
 from pymongo import MongoClient
 db = MongoClient('localhost', 27017,
-                 username=db_user, password=db_pwd, authSource='maintenant', authMechanism='SCRAM-SHA-256')
+                 username=db_user, password=db_pwd, authSource='maintenant', authMechanism='SCRAM-SHA-1')
 
 sms_client = Client(account_sid, auth_token)
 

@@ -5,7 +5,7 @@ import datetime
 from utils import update_flow_state, send_base_message, send_message
 
 db = MongoClient('localhost', 27017,
-                 username=db_user, password=db_pwd, authSource='maintenant', authMechanism='SCRAM-SHA-256')
+                 username=db_user, password=db_pwd, authSource='maintenant', authMechanism='SCRAM-SHA-1')
 
 sms_client = Client(account_sid, auth_token)
 

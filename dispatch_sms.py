@@ -8,7 +8,7 @@ import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
 db = MongoClient('localhost', 27017,
-                 username=db_user, password=db_pwd, authSource='maintenant', authMechanism='SCRAM-SHA-256')
+                 username=db_user, password=db_pwd, authSource='maintenant', authMechanism='SCRAM-SHA-1')
 
 sentry_sdk.init(
     dsn="https://361d7688867b44db99cd55f9b15333e3@sentry.io/1327058",

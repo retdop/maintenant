@@ -102,3 +102,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Pycharm
+.idea/
+
+# Conf files
+Maintenant-co-18e27771f6d8.json
+conf.py

@@ -45,7 +45,7 @@ def reception():
     if request.values.get('Body').lower() == 'stop':
         unsubscribe(user)
 
-    sms_dispatch[user['flow_state']](request, user)
+    return sms_dispatch[user['flow_state']](request, user)
 
 
 def parse_note(body):

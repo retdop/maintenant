@@ -4,11 +4,10 @@ from pymongo import MongoClient
 from new_challenge import send_new_challenge
 from update_collections import new_users
 from utils import update_flow_state, get_user, send_base_message, resp_message
-
-db = MongoClient('localhost', 27017)
-
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
+
+db = MongoClient('localhost', 27017)
 
 sentry_sdk.init(
     dsn="https://361d7688867b44db99cd55f9b15333e3@sentry.io/1327058",
@@ -177,4 +176,4 @@ sms_dispatch = {
 }
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)

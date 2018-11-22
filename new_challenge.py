@@ -13,7 +13,8 @@ sms_client = Client(account_sid, auth_token)
 def send_new_challenges():
     users = db.maintenant.users.find({})
     for user in users:
-        send_new_challenge(user)
+        if 'Batch' in user and user['Batch'] != 1 and user['Batch'] != 2:
+            send_new_challenge(user)
 
 
 def send_new_challenge(user, bypass_flow_state=False):

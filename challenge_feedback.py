@@ -34,4 +34,5 @@ def update_collections_after_end_of_challenge(user):
 
 
 if __name__ == '__main__':
+    print('Starting challenge feedback')
     send_feedback_messages()

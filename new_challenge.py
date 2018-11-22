@@ -20,7 +20,6 @@ def send_new_challenge(user, bypass_flow_state=False):
     if 'flow_state' in user and user['flow_state'] == 'challenge_sent' and not bypass_flow_state:
         return 0
     next_challenge_id = find_next_challenge_id(user)
-    print(next_challenge_id)
     new_challenge = db.maintenant.challenges.find_one({'challenge_id': next_challenge_id})
     print(new_challenge['initial_message'])
     send_message(user, new_challenge['initial_message'])

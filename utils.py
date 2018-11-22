@@ -25,7 +25,7 @@ def send_message(user, content):
 def resp_message(user, content):
     resp = MessagingResponse()
     resp.message(content)
-    print('{} message sent to {} {} from {}'.format('Some', user['Prnom'], user['Nom'], from_number))
+    print('New message sent to {} {} from {}'.format(user['Prnom'], user['Nom'], from_number))
     return str(resp)
 
 

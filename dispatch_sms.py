@@ -26,7 +26,7 @@ def receive_new_users():
     """Triggers a users collection update"""
     print('new users?')
     new_users()
-    return 'thanks'
+    return 'done'
 
 
 @app.route("/sms", methods=['GET', 'POST'])

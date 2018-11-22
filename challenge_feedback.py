@@ -13,10 +13,11 @@ sms_client = Client(account_sid, auth_token)
 def send_feedback_messages():
     users = db.maintenant.users.find({})
     feedback_message = db.maintenant.messages.find_one({'sms_id': 'SMS20'})
-    print(feedback_message['content'])
+    # print(feedback_message['content'])
     for user in users:
-        send_message(user, feedback_message['content'])
-        update_collections_after_end_of_challenge(user)
+        if 'flow_state' in user:
+            send_message(user, feedback_message['content'])
+            update_collections_after_end_of_challenge(user)
 
 
 def update_collections_after_end_of_challenge(user):

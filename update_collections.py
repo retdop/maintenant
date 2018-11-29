@@ -46,9 +46,14 @@ def new_users():
     spreadsheet_users_tel = [user['Tlphone'] for user in spreadsheet_users]
 
     new_users_tel = list(set(spreadsheet_users_tel).difference(users_tel))
+    if not len(new_users_tel):
+        return
 
-    db.maintenant[collection].delete_many({})
-    inserted_ids = db.maintenant[collection].insert_many(spreadsheet_users).inserted_ids
+    new_users_data = [user for user in spreadsheet_users if user['Tlphone'] not in users_tel]
+
+    # db.maintenant[collection].delete_many({})
+    # inserted_ids = db.maintenant[collection].update_many(spreadsheet_users).inserted_ids
+    inserted_ids = db.maintenant[collection].insert_many(new_users_data).inserted_ids
 
     print('Succesfully inserted {} documents in {} from {}'.format(len(inserted_ids), collection, spreadsheet))
 

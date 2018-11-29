@@ -1,6 +1,6 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from pymongo import MongoClient
+from pymongo import MongoClient, UpdateOne
 from twilio.rest import Client
 from conf import account_sid, auth_token, db_user, db_pwd
 from utils import update_flow_state, send_message
@@ -40,25 +40,23 @@ def new_users():
     collection = 'users'
     spreadsheet = 'inscrits_from_squarespace'
     users = list(db.maintenant.users.find({}))
-    users_tel = [user['Tlphone'] for user in users]
+    users_sub_date = [user['Submitted On'] for user in users]
 
     spreadsheet_users = get_spreadsheet_data('inscrits_from_squarespace')
-    spreadsheet_users_tel = [user['Tlphone'] for user in spreadsheet_users]
+    new_users_data = [user for user in spreadsheet_users if user['Submitted On'] not in users_sub_date]
+    old_users_updated_data = [user for user in spreadsheet_users if user['Submitted On'] in users_sub_date]
 
-    new_users_tel = list(set(spreadsheet_users_tel).difference(users_tel))
-    if not len(new_users_tel):
-        return
-
-    new_users_data = [user for user in spreadsheet_users if user['Tlphone'] not in users_tel]
-
-    # db.maintenant[collection].delete_many({})
-    # inserted_ids = db.maintenant[collection].update_many(spreadsheet_users).inserted_ids
     inserted_ids = db.maintenant[collection].insert_many(new_users_data).inserted_ids
-
     print('Succesfully inserted {} documents in {} from {}'.format(len(inserted_ids), collection, spreadsheet))
 
-    for tel in new_users_tel:
-        welcoming_committee(tel)
+    result = db.maintenant[collection].bulk_write([
+        UpdateOne(filter={'Submitted On': user['Submitted On']},
+                  update={'$set': user}) for user in old_users_updated_data])
+    print('Succesfully updated {} documents in {} from {}'.format(result.modified_count, collection, spreadsheet))
+
+    if len(new_users_data):
+        for user in new_users_data:
+            welcoming_committee(user['Tlphone'])
 
 
 def welcoming_committee(tel):

@@ -26,7 +26,7 @@ def update_collections_after_end_of_challenge(user):
 
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:
-        return 1
+        return "1"
     last_challenge_results_id = user_results[0]['_id']
 
     db.maintenant.results.update_one({

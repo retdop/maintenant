@@ -79,7 +79,7 @@ def receive_note_and_ask_relance(request, user):
     # flow_state : feedback_asked
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:
-        return 1
+        return "1"
     last_challenge_results_id = user_results[0]['_id']
 
     note = parse_note(request.values.get('Body'))
@@ -100,7 +100,7 @@ def receive_relance_and_ask_remarks(request, user):
     # flow_state : relance_asked
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:
-        return 1
+        return "1"
     last_challenge_results_id = user_results[0]['_id']
 
     relance = parse_relance(request.values.get('Body').lower())
@@ -118,7 +118,7 @@ def receive_remarks_and_send_challenge(request, user):
     # flow_state : remarks_asked
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:
-        return 1
+        return "1"
     last_challenge_results_id = user_results[0]['_id']
 
     db.maintenant.results.update_one({
@@ -132,7 +132,7 @@ def receive_response_and_continue(request, user):
     # flow_state : challenge_sent
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:
-        return 1
+        return "1"
     last_challenge_id = user_results[0]['challenge_id']
 
     challenge_response = parse_challenge_response(request.values.get('Body'))

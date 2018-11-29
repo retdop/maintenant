@@ -63,7 +63,7 @@ def new_users():
 def welcoming_committee(tel):
     user = db.maintenant.users.find_one({'Tlphone': tel})
     if 'flow_state' in user:
-        return 0
+        return "0"
     welcome_message = db.maintenant.messages.find_one({'sms_id': 'SMS1'})
     send_message(user, welcome_message['content'])
 

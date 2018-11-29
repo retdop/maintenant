@@ -19,7 +19,7 @@ def send_new_challenges():
 
 def send_new_challenge(user, bypass_flow_state=False):
     if 'flow_state' in user and user['flow_state'] == 'challenge_sent' and not bypass_flow_state:
-        return 0
+        return "0"
     next_challenge_id = find_next_challenge_id(user)
     new_challenge = db.maintenant.challenges.find_one({'challenge_id': next_challenge_id})
     print(new_challenge['initial_message'])
@@ -48,7 +48,7 @@ def find_next_challenge_id(user):
 
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:
-        return 1
+        return "1"
 
     last_challenge_id = user_results[0]['challenge_id']
     challenges = db.maintenant.results.find({})

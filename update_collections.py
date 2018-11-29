@@ -46,8 +46,9 @@ def new_users():
     new_users_data = [user for user in spreadsheet_users if user['Submitted On'] not in users_sub_date]
     old_users_updated_data = [user for user in spreadsheet_users if user['Submitted On'] in users_sub_date]
 
-    inserted_ids = db.maintenant[collection].insert_many(new_users_data).inserted_ids
-    print('Succesfully inserted {} documents in {} from {}'.format(len(inserted_ids), collection, spreadsheet))
+    if len(new_users_data):
+        inserted_ids = db.maintenant[collection].insert_many(new_users_data).inserted_ids
+        print('Succesfully inserted {} documents in {} from {}'.format(len(inserted_ids), collection, spreadsheet))
 
     result = db.maintenant[collection].bulk_write([
         UpdateOne(filter={'Submitted On': user['Submitted On']},

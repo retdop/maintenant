@@ -20,6 +20,7 @@ def send_message(user, content):
         to=make_nice_phone_number(user['Tlphone'])
     )
     print('New message sent to {} {} from {} ({})'.format(user['Prnom'], user['Nom'], from_number, msg.sid))
+    return msg.sid
 
 
 def resp_message(user, content):

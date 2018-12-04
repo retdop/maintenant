@@ -48,7 +48,15 @@ def find_next_challenge_id(user):
 
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:
-        return "1"
+        return 1
+
+    user_results_cid = db.maintenant.results.find({'user_id': user['_id']}).sort('challenge_id', 1)
+    if user_results_cid.count() == 0:
+        return 1
+
+    for i in range(len(user_results_cid)):
+        if user_results_cid[i]['challenge_id'] != i + 1:
+            return i + 1
 
     last_challenge_id = user_results[0]['challenge_id']
     challenges = db.maintenant.results.find({})
@@ -58,7 +66,8 @@ def find_next_challenge_id(user):
     try_next = True
     next_challenge_id = last_challenge_id + 1
     while try_next:
-        next_challenges = db.maintenant.results.find({'user_id': user['_id'], 'challenge_id': next_challenge_id}).sort('date', -1)
+        next_challenges = db.maintenant.results.find({'user_id': user['_id'], 'challenge_id': next_challenge_id})\
+            .sort('date', -1)
         if next_challenges.count() == 0:
             return next_challenge_id
         next_challenge = next_challenges[0]

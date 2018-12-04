@@ -45,28 +45,39 @@ def update_db_after_new_challenge(user, next_challenge_id):
 
 
 def find_next_challenge_id(user):
+    challenges = db.maintenant.results.find({})
 
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:
         return 1
 
+    # check if all challenges has been made or make the lowest one
     user_results_cid = db.maintenant.results.find({'user_id': user['_id']}).sort('challenge_id', 1)
     if user_results_cid.count() == 0:
         return 1
 
-    for i in range(len(user_results_cid)):
-        if user_results_cid[i]['challenge_id'] != i + 1:
-            return i + 1
+    challenge_id_index = 0
+    for result in user_results_cid:
+        current_challenge_id = result['challenge_id']
+        if current_challenge_id == challenge_id_index:
+            pass
+        if current_challenge_id == challenge_id_index + 1:
+            challenge_id_index += 1
+            pass
+        if current_challenge_id > challenge_id_index + 1:
+            return challenge_id_index + 1
+
+    if challenge_id_index < challenges.count():
+        return challenge_id_index + 1
 
     last_challenge_id = user_results[0]['challenge_id']
-    challenges = db.maintenant.results.find({})
     if last_challenge_id == challenges.count():
         last_challenge_id = 0
 
     try_next = True
     next_challenge_id = last_challenge_id + 1
     while try_next:
-        next_challenges = db.maintenant.results.find({'user_id': user['_id'], 'challenge_id': next_challenge_id})\
+        next_challenges = db.maintenant.results.find({'user_id': user['_id'], 'challenge_id': next_challenge_id}) \
             .sort('date', -1)
         if next_challenges.count() == 0:
             return next_challenge_id

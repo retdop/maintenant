@@ -1,7 +1,9 @@
+import requests
 from twilio.rest import Client
 from twilio.twiml.messaging_response import MessagingResponse
-from conf import account_sid, auth_token, from_number, db_user, db_pwd
+from conf import account_sid, auth_token, from_number, db_user, db_pwd, device_id, access_token
 from pymongo import MongoClient
+
 db = MongoClient('localhost', 27017,
                  username=db_user, password=db_pwd, authSource='maintenant', authMechanism='SCRAM-SHA-1')
 
@@ -13,7 +15,7 @@ def send_base_message(user, sms_id):
     return send_message(user, message['content'])
 
 
-def send_message(user, content):
+def send_message_twilio(user, content):
     msg = sms_client.messages.create(
         body=content,
         from_=from_number,
@@ -21,6 +23,23 @@ def send_message(user, content):
     )
     print('New message sent to {} {} from {} ({})'.format(user['Prnom'], user['Nom'], from_number, msg.sid))
     return msg.sid
+
+
+def send_message_free(user, content):
+    r = requests.post('https://smsgateway.me/api/v4/message/send',
+                      headers={
+                          'Authorization': access_token},
+                      json=[{
+                              'phone_number': make_nice_phone_number(user['Tlphone']),
+                              'message': content,
+                              'device_id': device_id
+                          }]
+                      )
+    print('New message sent to {} {} from {} (code {})'.format(user['Prnom'], user['Nom'], from_number, r.status_code))
+    return r.text
+
+
+send_message = send_message_free
 
 
 def resp_message(user, content):
@@ -45,3 +64,8 @@ def update_flow_state(user, new_flow_state):
 
 def make_nice_phone_number(phone_number):
     return '+33' + str(phone_number).replace(' ', '')[-9:]
+
+
+if __name__ == '__main__':
+    user_ = db.maintenant.users.find_one({'Nom': 'Bastard'})
+    send_message(user_, 'Test1')

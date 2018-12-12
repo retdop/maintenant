@@ -38,14 +38,17 @@ def reception():
 
     # Save the new counter value in the session
     session['counter'] = counter
-    user_number = request.values.get('From')
+    user_number = request.json['phone_number']
+    message = request.json['message']
     user = get_user(user_number)
     if not user:
         return 'NOK'
-    if request.values.get('Body').lower() == 'stop':
+    if message.lower() == 'stop':
         unsubscribe(user)
 
-    return sms_dispatch[user['flow_state']](request, user)
+    return sms_dispatch[user['flow_state']](message, user)
+
+
 
 
 def parse_note(body):
@@ -75,14 +78,14 @@ def parse_challenge_response(challenge_response):
     return challenge_response
 
 
-def receive_note_and_ask_relance(request, user):
+def receive_note_and_ask_relance(message, user):
     # flow_state : feedback_asked
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:
         return "1"
     last_challenge_results_id = user_results[0]['_id']
 
-    note = parse_note(request.values.get('Body'))
+    note = parse_note(message)
 
     db.maintenant.results.update_one({
         '_id': last_challenge_results_id},
@@ -96,14 +99,14 @@ def receive_note_and_ask_relance(request, user):
         return send_base_message(user, 'SMS31')
 
 
-def receive_relance_and_ask_remarks(request, user):
+def receive_relance_and_ask_remarks(message, user):
     # flow_state : relance_asked
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:
         return "1"
     last_challenge_results_id = user_results[0]['_id']
 
-    relance = parse_relance(request.values.get('Body').lower())
+    relance = parse_relance(message.lower())
 
     db.maintenant.results.update_one({
         '_id': last_challenge_results_id},
@@ -114,7 +117,7 @@ def receive_relance_and_ask_remarks(request, user):
     return send_base_message(user, 'SMS40')
 
 
-def receive_remarks_and_send_challenge(request, user):
+def receive_remarks_and_send_challenge(message, user):
     # flow_state : remarks_asked
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:
@@ -123,19 +126,19 @@ def receive_remarks_and_send_challenge(request, user):
 
     db.maintenant.results.update_one({
         '_id': last_challenge_results_id},
-        {'$set': {'remarks': request.values.get('Body')}})
+        {'$set': {'remarks': message}})
 
     return send_new_challenge(user)
 
 
-def receive_response_and_continue(request, user):
+def receive_response_and_continue(message, user):
     # flow_state : challenge_sent
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:
         return "1"
     last_challenge_id = user_results[0]['challenge_id']
 
-    challenge_response = parse_challenge_response(request.values.get('Body'))
+    challenge_response = parse_challenge_response(message)
     challenge = db.maintenant.challenges.find_one({'challenge_id': last_challenge_id})
     if challenge_response == '!':
         message = challenge['exclam_message']
@@ -149,9 +152,9 @@ def receive_response_and_continue(request, user):
     return resp_message(user, message)
 
 
-def receive_verif_number_and_welcome(request, user):
+def receive_verif_number_and_welcome(message, user):
     # flow_state : verif_number
-    verif_number_response = request.values.get('Body').lower()
+    verif_number_response = message.lower()
 
     if verif_number_response == 'oui':
         update_flow_state(user, 'number_verified')

@@ -28,21 +28,24 @@ def send_message_twilio(user, content):
 def send_message_free(user, content):
     r = requests.post('https://smsgateway.me/api/v4/message/send',
                       headers={
-                          'Authorization': access_token},
+                          'Authorization': access_token
+                      },
                       json=[{
                               'phone_number': make_nice_phone_number(user['Tlphone']),
                               'message': content,
                               'device_id': device_id
-                          }]
+                          }],
+                      verify=False
                       )
-    print('New message sent to {} {} from {} (code {})'.format(user['Prnom'], user['Nom'], from_number, r.status_code))
+    print('New message sent to {} {} (code {})'.format(user['Prnom'], user['Nom'], r.status_code))
     return r.text
 
 
 send_message = send_message_free
+resp_message = send_message
 
 
-def resp_message(user, content):
+def resp_message_twilio(user, content):
     resp = MessagingResponse()
     resp.message(content)
     print('New message sent to {} {} from {}'.format(user['Prnom'], user['Nom'], from_number))

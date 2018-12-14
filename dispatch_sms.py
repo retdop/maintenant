@@ -49,8 +49,6 @@ def reception():
     return sms_dispatch[user['flow_state']](message, user)
 
 
-
-
 def parse_note(body):
     try:
         note = int(body)
@@ -85,7 +83,7 @@ def receive_note_and_ask_relance(message, user):
         return "1"
     last_challenge_results_id = user_results[0]['_id']
 
-    note = parse_note(message)
+    note = parse_note(message.replace(' ', ''))
 
     db.maintenant.results.update_one({
         '_id': last_challenge_results_id},
@@ -106,7 +104,7 @@ def receive_relance_and_ask_remarks(message, user):
         return "1"
     last_challenge_results_id = user_results[0]['_id']
 
-    relance = parse_relance(message.lower())
+    relance = parse_relance(message.lower().replace(' ', ''))
 
     db.maintenant.results.update_one({
         '_id': last_challenge_results_id},
@@ -138,7 +136,7 @@ def receive_response_and_continue(message, user):
         return "1"
     last_challenge_id = user_results[0]['challenge_id']
 
-    challenge_response = parse_challenge_response(message)
+    challenge_response = parse_challenge_response(message.replace(' ', ''))
     challenge = db.maintenant.challenges.find_one({'challenge_id': last_challenge_id})
     if challenge_response == '!':
         message = challenge['exclam_message']
@@ -154,7 +152,7 @@ def receive_response_and_continue(message, user):
 
 def receive_verif_number_and_welcome(message, user):
     # flow_state : verif_number
-    verif_number_response = message.lower()
+    verif_number_response = message.lower().replace(' ', '')
 
     if verif_number_response == 'oui':
         update_flow_state(user, 'number_verified')

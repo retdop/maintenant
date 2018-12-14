@@ -97,7 +97,38 @@ def receive_note_and_ask_relance(message, user):
         return send_base_message(user, 'SMS31')
 
 
-def receive_relance_and_ask_remarks(message, user):
+# def receive_relance_and_ask_remarks(message, user):
+#     # flow_state : relance_asked
+#     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
+#     if user_results.count() == 0:
+#         return "1"
+#     last_challenge_results_id = user_results[0]['_id']
+#
+#     relance = parse_relance(message.lower().replace(' ', ''))
+#
+#     db.maintenant.results.update_one({
+#         '_id': last_challenge_results_id},
+#         {'$set': {'relance': relance}})
+#
+#     update_flow_state(user, 'remarks_asked')
+#
+#     return send_base_message(user, 'SMS40')
+#
+#
+# def receive_remarks_and_send_challenge(message, user):
+#     # flow_state : remarks_asked
+#     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
+#     if user_results.count() == 0:
+#         return "1"
+#     last_challenge_results_id = user_results[0]['_id']
+#
+#     db.maintenant.results.update_one({
+#         '_id': last_challenge_results_id},
+#         {'$set': {'remarks': message}})
+#
+#     return send_new_challenge(user)
+
+def receive_relance_and_send_challenge(message, user):
     # flow_state : relance_asked
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:
@@ -109,22 +140,6 @@ def receive_relance_and_ask_remarks(message, user):
     db.maintenant.results.update_one({
         '_id': last_challenge_results_id},
         {'$set': {'relance': relance}})
-
-    update_flow_state(user, 'remarks_asked')
-
-    return send_base_message(user, 'SMS40')
-
-
-def receive_remarks_and_send_challenge(message, user):
-    # flow_state : remarks_asked
-    user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
-    if user_results.count() == 0:
-        return "1"
-    last_challenge_results_id = user_results[0]['_id']
-
-    db.maintenant.results.update_one({
-        '_id': last_challenge_results_id},
-        {'$set': {'remarks': message}})
 
     return send_new_challenge(user)
 
@@ -171,8 +186,8 @@ def unsubscribe(user):
 
 sms_dispatch = {
     'feedback_asked': receive_note_and_ask_relance,
-    'relance_asked': receive_relance_and_ask_remarks,
-    'remarks_asked': receive_remarks_and_send_challenge,
+    'relance_asked': receive_relance_and_send_challenge,
+    # 'remarks_asked': receive_remarks_and_send_challenge,
     'challenge_sent': receive_response_and_continue,
     'verif_number': receive_verif_number_and_welcome
 }

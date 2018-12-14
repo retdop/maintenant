@@ -15,7 +15,7 @@ def send_feedback_messages():
     feedback_message = db.maintenant.messages.find_one({'sms_id': 'SMS20'})
     # print(feedback_message['content'])
     for user in users:
-        if 'flow_state' in user:
+        if 'flow_state' in user and user['flow_state'] != 'verif_number':
             if 'Batch' in user and user['Batch'] != 1 and user['Batch'] != 2:
                 send_message(user, feedback_message['content'])
                 update_collections_after_end_of_challenge(user)

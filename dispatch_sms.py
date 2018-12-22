@@ -6,6 +6,7 @@ from update_collections import new_users
 from utils import update_flow_state, get_user, send_base_message, resp_message
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
+import re
 
 db = MongoClient('localhost', 27017,
                  username=db_user, password=db_pwd, authSource='maintenant', authMechanism='SCRAM-SHA-1')
@@ -53,7 +54,10 @@ def parse_note(body):
     try:
         note = int(body)
     except ValueError:
-        note = 0
+        try:
+            note = int(re.search('[0-9]', body).group())
+        except (AttributeError, ValueError):
+            note = 0
     if note > 5:
         note = 5
     if note < 0:

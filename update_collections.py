@@ -37,6 +37,7 @@ def update_all_collections():
 
 
 def new_users():
+    # we should probably clean the phone number instead of the ugly thing we did in get_user
     collection = 'users'
     spreadsheet = 'inscrits_from_squarespace'
     users = list(db.maintenant.users.find({}))

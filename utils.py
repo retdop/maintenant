@@ -53,11 +53,31 @@ def resp_message_twilio(user, content):
 
 
 def get_user(phone_number):
+    # this is ugly
     user = db.maintenant.users.find_one({'Tlphone': int(phone_number.replace(' ', '')[-9:])})
     if not user:
-        # try with french indic code
-        # TODO: add other countries
-        user = db.maintenant.users.find_one({'Tlphone': int('33' + phone_number.replace(' ', '')[-9:])})
+        # try with spaces and leading zero
+        ten_digit = '0' + phone_number.replace(' ', '')[-9:]
+        spaces_number = ' '.join(a+b for a,b in zip(ten_digit[::2], ten_digit[1::2]))
+        user = db.maintenant.users.find_one({'Tlphone': spaces_number})
+        if not user:
+            # try with french indic code
+            # TODO: add other countries
+            user = db.maintenant.users.find_one({'Tlphone': int('33' + phone_number.replace(' ', '')[-9:])})
+    return user
+
+
+def get_user(phone_number):
+    # this is ugly
+    user = db.maintenant.users.find_one({'Tlphone': int(phone_number.replace(' ', '')[-9:])})
+    if not user:
+        # try with spaces and leading zero
+        ten_digit_phone_number = '0' + phone_number.replace(' ', '')[-9:]
+        user = db.maintenant.users.find_one({'Tlphone': ' '.join(a+b for a,b in zip(ten_digit_phone_number[::2], ten_digit_phone_number[1::2])))
+        if not user
+            # try with french indic code
+            # TODO: add other countries
+            user = db.maintenant.users.find_one({'Tlphone': int('33' + phone_number.replace(' ', '')[-9:])})
     return user
 
 

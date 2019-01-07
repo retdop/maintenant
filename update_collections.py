@@ -32,7 +32,6 @@ def update_collection(spreadsheet, collection):
 
 def update_all_collections():
     update_collection('Défis', 'challenges')
-    update_collection('inscrits_from_squarespace', 'users')
     update_collection('Messages de base', 'messages')
 
 

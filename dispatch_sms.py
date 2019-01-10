@@ -66,18 +66,20 @@ def parse_note(body):
 
 
 def parse_relance(body):
+    validated_message = ''.join(x for x in body if x.isalpha()).lower()
     relance = 0
-    if body == 'oui':
+    if validated_message == 'oui':
         relance = 1
-    if body != 'oui' and body != 'non':
+    if validated_message != 'oui' and validated_message != 'non':
         relance = 1
     return relance
 
 
 def parse_challenge_response(challenge_response):
-    if challenge_response != '!' and challenge_response != '?' and challenge_response.lower() != 'suivant':
-        challenge_response = '!'
-    return challenge_response
+    validated_message = ''.join(x for x in challenge_response if x.isalpha() or x == '!' or x == '?').lower()
+    if validated_message != '!' and validated_message != '?' and validated_message.lower() != 'suivant':
+        validated_message = '!'
+    return validated_message
 
 
 def receive_note_and_ask_relance(message, user):
@@ -87,7 +89,7 @@ def receive_note_and_ask_relance(message, user):
         return "1"
     last_challenge_results_id = user_results[0]['_id']
 
-    note = parse_note(message.replace(' ', ''))
+    note = parse_note(message)
 
     db.maintenant.results.update_one({
         '_id': last_challenge_results_id},
@@ -139,7 +141,7 @@ def receive_relance_and_send_challenge(message, user):
         return "1"
     last_challenge_results_id = user_results[0]['_id']
 
-    relance = parse_relance(message.lower().replace(' ', ''))
+    relance = parse_relance(message)
 
     db.maintenant.results.update_one({
         '_id': last_challenge_results_id},
@@ -155,7 +157,7 @@ def receive_response_and_continue(message, user):
         return "1"
     last_challenge_id = user_results[0]['challenge_id']
 
-    challenge_response = parse_challenge_response(message.replace(' ', ''))
+    challenge_response = parse_challenge_response(message)
     challenge = db.maintenant.challenges.find_one({'challenge_id': last_challenge_id})
     if challenge_response == '!':
         message = challenge['exclam_message']

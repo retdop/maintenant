@@ -19,7 +19,7 @@ def send_new_challenges():
 
 def send_new_challenge(user, bypass_flow_state=False):
     # send only to people with number_verified
-    if 'flow_state' in user and user['flow_state'] == 'number_verified' and not bypass_flow_state:
+    if 'flow_state' in user and user['flow_state'] != 'number_verified' and not bypass_flow_state:
         return "0"
     next_challenge_id = find_next_challenge_id(user)
     new_challenge = db.maintenant.challenges.find_one({'challenge_id': next_challenge_id})
@@ -27,7 +27,6 @@ def send_new_challenge(user, bypass_flow_state=False):
     send_message(user, new_challenge['initial_message'])
     send_base_message(user, 'SMS11')
     update_db_after_new_challenge(user, next_challenge_id)
-
     return new_challenge['initial_message']
 
 

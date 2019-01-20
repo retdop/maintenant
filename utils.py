@@ -15,10 +15,15 @@ def send_base_message(user, sms_id):
     return send_message(good_user, message['content'])
 
 
-def send_challenge_message(user, challenge_id):
+def send_challenge_message(user, challenge_id, option=None):
     good_user = verify_user(user)
     new_challenge = db.maintenant.challenges.find_one({'challenge_id': challenge_id})
-    return send_message(good_user, new_challenge['initial_message'])
+    if option == '!':
+        return send_message(good_user, new_challenge['exclam_message'])
+    if option == '?':
+        return send_message(good_user, new_challenge['why_message'])
+    else:
+        return send_message(good_user, new_challenge['initial_message'])
 
 
 def send_message_twilio(user, content):

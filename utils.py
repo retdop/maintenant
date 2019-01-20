@@ -3,13 +3,22 @@ from twilio.rest import Client
 from twilio.twiml.messaging_response import MessagingResponse
 from conf import account_sid, auth_token, from_number, device_id, access_token
 from database import db
+from bson.objectid import ObjectId
+
 
 sms_client = Client(account_sid, auth_token)
 
 
 def send_base_message(user, sms_id):
+    good_user = verify_user(user)
     message = db.maintenant.messages.find_one({'sms_id': sms_id})
-    return send_message(user, message['content'])
+    return send_message(good_user, message['content'])
+
+
+def send_challenge_message(user, challenge_id):
+    good_user = verify_user(user)
+    new_challenge = db.maintenant.challenges.find_one({'challenge_id': challenge_id})
+    return send_message(good_user, new_challenge['initial_message'])
 
 
 def send_message_twilio(user, content):
@@ -65,7 +74,24 @@ def get_user(phone_number):
 
 
 def update_flow_state(user, new_flow_state):
-    db.maintenant.users.update_one({'_id': user['_id']}, {'$set': {'flow_state': new_flow_state}})
+    good_user = verify_user(user)
+    db.maintenant.users.update_one({'_id': good_user['_id']}, {'$set': {'flow_state': new_flow_state}})
+
+
+def get_user_from_id(user_id):
+    user = db.maintenant.users.find_one({'_id': user_id})
+    if not user:
+        print('user not found')
+    return user
+
+
+def verify_user(user):
+    if type(user) == str:
+        return get_user_from_id(ObjectId(user))
+    elif type(user) == ObjectId:
+        return get_user_from_id(user)
+    else:
+        return user
 
 
 def make_nice_phone_number(phone_number):

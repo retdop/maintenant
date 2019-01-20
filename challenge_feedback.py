@@ -1,13 +1,5 @@
-from twilio.rest import Client
-from conf import account_sid, auth_token, db_user, db_pwd
-from pymongo import MongoClient
 from utils import update_flow_state, send_message
-
-
-db = MongoClient('localhost', 27017,
-                 username=db_user, password=db_pwd, authSource='maintenant', authMechanism='SCRAM-SHA-1')
-
-sms_client = Client(account_sid, auth_token)
+from database import db
 
 
 def send_feedback_messages():

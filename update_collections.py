@@ -1,12 +1,10 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from pymongo import MongoClient, UpdateOne
+from pymongo import UpdateOne
 from twilio.rest import Client
-from conf import account_sid, auth_token, db_user, db_pwd
+from conf import account_sid, auth_token
 from utils import update_flow_state, send_message
-
-db = MongoClient('localhost', 27017,
-                 username=db_user, password=db_pwd, authSource='maintenant', authMechanism='SCRAM-SHA-1')
+from database import db
 
 sms_client = Client(account_sid, auth_token)
 

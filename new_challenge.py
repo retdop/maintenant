@@ -1,11 +1,8 @@
 from twilio.rest import Client
-from conf import account_sid, auth_token, db_user, db_pwd
-from pymongo import MongoClient
+from conf import account_sid, auth_token
 import datetime
 from utils import update_flow_state, send_base_message, send_message
-
-db = MongoClient('localhost', 27017,
-                 username=db_user, password=db_pwd, authSource='maintenant', authMechanism='SCRAM-SHA-1')
+from database import db
 
 sms_client = Client(account_sid, auth_token)
 
@@ -18,7 +15,8 @@ def send_new_challenges():
 
 
 def send_new_challenge(user, bypass_flow_state=False):
-    if 'flow_state' in user and user['flow_state'] == 'challenge_sent' and not bypass_flow_state:
+    if not bypass_flow_state and 'flow_state' in user and user['flow_state'] != 'feedback_asked' \
+            and user['flow_state'] != 'relance_asked' and user['flow_state'] != 'number_verified':
         return "0"
     next_challenge_id = find_next_challenge_id(user)
     new_challenge = db.maintenant.challenges.find_one({'challenge_id': next_challenge_id})

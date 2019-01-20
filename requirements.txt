@@ -1,3 +1,4 @@
+bson
 requests
 twilio==6.19.2
 pymongo==3.7.2

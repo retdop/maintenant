@@ -1,10 +1,7 @@
-from twilio.rest import Client
-from conf import account_sid, auth_token
 import datetime
-from utils import update_flow_state, send_base_message, send_message
+from utils import update_flow_state, send_base_message, send_challenge_message
 from database import db
-
-sms_client = Client(account_sid, auth_token)
+from flow_states import feedback_asked, relance_asked, challenge_sent, number_verified
 
 
 def send_new_challenges():
@@ -15,24 +12,22 @@ def send_new_challenges():
 
 
 def send_new_challenge(user, bypass_flow_state=False):
-    if not bypass_flow_state and 'flow_state' in user and user['flow_state'] != 'feedback_asked' \
-            and user['flow_state'] != 'relance_asked' and user['flow_state'] != 'number_verified':
+    if not bypass_flow_state and 'flow_state' in user and user['flow_state'] != feedback_asked \
+            and user['flow_state'] != relance_asked and user['flow_state'] != number_verified:
         return "0"
     next_challenge_id = find_next_challenge_id(user)
-    new_challenge = db.maintenant.challenges.find_one({'challenge_id': next_challenge_id})
-    print(new_challenge['initial_message'])
-    send_message(user, new_challenge['initial_message'])
+    send_challenge_message(user, next_challenge_id)
     send_base_message(user, 'SMS11')
     update_db_after_new_challenge(user, next_challenge_id)
 
-    return new_challenge['initial_message']
+    return "OK"
 
 
 def update_db_after_new_challenge(user, next_challenge_id):
     db.maintenant.users.update_one({'_id': user['_id']}, {'$set': {
         'current_challenge_id': next_challenge_id}})
 
-    update_flow_state(user, 'challenge_sent')
+    update_flow_state(user, challenge_sent)
     db.maintenant.results.insert_one({
         'challenge_id': next_challenge_id,
         'state': 'current',

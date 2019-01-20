@@ -2,7 +2,8 @@ from flask import Flask, request, session
 from conf import session_key
 from new_challenge import send_new_challenge
 from update_collections import new_users
-from utils import update_flow_state, get_user, send_base_message, resp_message
+from utils import update_flow_state, get_user, send_base_message, send_challenge_message
+from flow_states import feedback_asked, relance_asked, challenge_sent, verif_number, number_verified
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 import re
@@ -43,7 +44,7 @@ def reception():
     if not user:
         return 'NOK'
     if message.lower() == 'stop':
-        unsubscribe(user)
+        return unsubscribe(user)
 
     return sms_dispatch[user['flow_state']](message, user)
 
@@ -93,44 +94,13 @@ def receive_note_and_ask_relance(message, user):
         '_id': last_challenge_results_id},
         {'$set': {'note': note}})
 
-    update_flow_state(user, 'relance_asked')
+    update_flow_state(user, relance_asked)
 
     if note < 3:
         return send_base_message(user, 'SMS32')
     else:
         return send_base_message(user, 'SMS31')
 
-
-# def receive_relance_and_ask_remarks(message, user):
-#     # flow_state : relance_asked
-#     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
-#     if user_results.count() == 0:
-#         return "1"
-#     last_challenge_results_id = user_results[0]['_id']
-#
-#     relance = parse_relance(message.lower().replace(' ', ''))
-#
-#     db.maintenant.results.update_one({
-#         '_id': last_challenge_results_id},
-#         {'$set': {'relance': relance}})
-#
-#     update_flow_state(user, 'remarks_asked')
-#
-#     return send_base_message(user, 'SMS40')
-#
-#
-# def receive_remarks_and_send_challenge(message, user):
-#     # flow_state : remarks_asked
-#     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
-#     if user_results.count() == 0:
-#         return "1"
-#     last_challenge_results_id = user_results[0]['_id']
-#
-#     db.maintenant.results.update_one({
-#         '_id': last_challenge_results_id},
-#         {'$set': {'remarks': message}})
-#
-#     return send_new_challenge(user)
 
 def receive_relance_and_send_challenge(message, user):
     # flow_state : relance_asked
@@ -153,20 +123,16 @@ def receive_response_and_continue(message, user):
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:
         return "1"
-    last_challenge_id = user_results[0]['challenge_id']
 
+    last_challenge_id = user_results[0]['challenge_id']
     challenge_response = parse_challenge_response(message)
-    challenge = db.maintenant.challenges.find_one({'challenge_id': last_challenge_id})
-    if challenge_response == '!':
-        message = challenge['exclam_message']
-    elif challenge_response == '?':
-        message = challenge['why_message']
+    if challenge_response == '?':
+        send_challenge_message(user, last_challenge_id, option='?')
     elif challenge_response.lower() == 'suivant':
         return send_new_challenge(user, bypass_flow_state=True)
     else:
-        message = challenge['exclam_response']
-
-    return resp_message(user, message)
+        send_challenge_message(user, last_challenge_id, option='!')
+    return "OK"
 
 
 def receive_verif_number_and_welcome(message, user):
@@ -174,26 +140,31 @@ def receive_verif_number_and_welcome(message, user):
     verif_number_response = message.lower().replace(' ', '')
 
     if verif_number_response == 'oui':
-        update_flow_state(user, 'number_verified')
+        update_flow_state(user, number_verified)
     else:
-        print('user {} {} wants to unsubscribe'.format(user['Prnom'], user['Nom']))
+        return unsubscribe(user)
 
-    message = db.maintenant.messages.find_one({'sms_id': 'SMS2'})
-
-    return resp_message(user, message['content'])
+    return send_base_message(user, 'SMS2')
 
 
 def unsubscribe(user):
     # This will never happen because twilio catches the STOP message before us!
     print('user {} {} wants to unsubscribe'.format(user['Prnom'], user['Nom']))
+    return "OK"
+
+
+def do_nothing(message, user):
+    print('user {} {} is on number_verfied but sent a message'.format(user['Prnom'], user['Nom']))
+    print(message)
+    return 'OK'
 
 
 sms_dispatch = {
-    'feedback_asked': receive_note_and_ask_relance,
-    'relance_asked': receive_relance_and_send_challenge,
-    # 'remarks_asked': receive_remarks_and_send_challenge,
-    'challenge_sent': receive_response_and_continue,
-    'verif_number': receive_verif_number_and_welcome
+    feedback_asked: receive_note_and_ask_relance,
+    relance_asked: receive_relance_and_send_challenge,
+    challenge_sent: receive_response_and_continue,
+    verif_number: receive_verif_number_and_welcome,
+    number_verified: do_nothing
 }
 
 if __name__ == "__main__":

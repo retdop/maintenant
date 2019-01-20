@@ -36,6 +36,13 @@ def send_message_twilio(user, content):
     return msg.sid
 
 
+def resp_message_twilio(user, content):
+    resp = MessagingResponse()
+    resp.message(content)
+    print('New message sent to {} {} from {}'.format(user['Prnom'], user['Nom'], from_number))
+    return str(resp)
+
+
 def send_message_free(user, content):
     r = requests.post('https://smsgateway.me/api/v4/message/send',
                       headers={
@@ -56,20 +63,13 @@ send_message = send_message_free
 resp_message = send_message
 
 
-def resp_message_twilio(user, content):
-    resp = MessagingResponse()
-    resp.message(content)
-    print('New message sent to {} {} from {}'.format(user['Prnom'], user['Nom'], from_number))
-    return str(resp)
-
-
 def get_user(phone_number):
     # this is ugly
     user = db.maintenant.users.find_one({'Tlphone': int(phone_number.replace(' ', '')[-9:])})
     if not user:
         # try with spaces and leading zero
         ten_digit = '0' + phone_number.replace(' ', '')[-9:]
-        spaces_number = ' '.join(a+b for a,b in zip(ten_digit[::2], ten_digit[1::2]))
+        spaces_number = ' '.join(a+b for a, b in zip(ten_digit[::2], ten_digit[1::2]))
         user = db.maintenant.users.find_one({'Tlphone': spaces_number})
         if not user:
             # try with french indic code

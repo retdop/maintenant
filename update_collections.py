@@ -6,8 +6,6 @@ from conf import account_sid, auth_token
 from utils import update_flow_state, send_message
 from database import db
 
-sms_client = Client(account_sid, auth_token)
-
 
 def get_spreadsheet_data(spreadsheet):
     scope = ['https://spreadsheets.google.com/feeds',
@@ -65,7 +63,7 @@ def welcoming_committee(tel):
     welcome_message = db.maintenant.messages.find_one({'sms_id': 'SMS1'})
     send_message(user, welcome_message['content'])
 
-    update_flow_state(user, 'verif_number')
+    update_flow_state(user, verif_number)
 
 
 if __name__ == '__main__':

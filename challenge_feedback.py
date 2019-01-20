@@ -1,6 +1,7 @@
 from utils import update_flow_state, send_base_message
 from database import db
 from flow_states import feedback_asked, verif_number, number_verified
+from time import sleep
 
 
 def send_feedback_messages():
@@ -10,6 +11,7 @@ def send_feedback_messages():
             if 'Batch' in user and user['Batch'] != 1 and user['Batch'] != 2:
                 send_base_message(user, 'SMS20')
                 update_collections_after_end_of_challenge(user)
+                sleep(5)
 
 
 def update_collections_after_end_of_challenge(user):

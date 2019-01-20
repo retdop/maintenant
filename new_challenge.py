@@ -2,6 +2,7 @@ import datetime
 from utils import update_flow_state, send_base_message, send_challenge_message
 from database import db
 from flow_states import feedback_asked, relance_asked, challenge_sent, number_verified
+from time import sleep
 
 
 def send_new_challenges():
@@ -9,6 +10,7 @@ def send_new_challenges():
     for user in users:
         if 'Batch' in user and user['Batch'] != 1 and user['Batch'] != 2:
             send_new_challenge(user)
+            sleep(5)
 
 
 def send_new_challenge(user, bypass_flow_state=False):

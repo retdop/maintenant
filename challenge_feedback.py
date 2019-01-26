@@ -1,13 +1,13 @@
 from utils import update_flow_state, send_base_message
 from database import db
-from flow_states import feedback_asked, verif_number, number_verified
+from flow_states import feedback_asked, challenge_sent
 from time import sleep
 
 
 def send_feedback_messages():
     users = db.maintenant.users.find({})
     for user in users:
-        if 'flow_state' in user and user['flow_state'] != verif_number and user['flow_state'] != number_verified:
+        if 'flow_state' in user and user['flow_state'] == challenge_sent:
             if 'Batch' in user and user['Batch'] != 1 and user['Batch'] != 2:
                 send_base_message(user, 'SMS20')
                 update_collections_after_end_of_challenge(user)

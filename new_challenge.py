@@ -14,8 +14,10 @@ def send_new_challenges():
 
 
 def send_new_challenge(user, bypass_flow_state=False):
-    if not bypass_flow_state and 'flow_state' in user and user['flow_state'] != feedback_asked \
-            and user['flow_state'] != relance_asked and user['flow_state'] != number_verified:
+    if not bypass_flow_state and 'flow_state' in user and \
+            not (user['flow_state'] == feedback_asked
+                 or user['flow_state'] == relance_asked
+                 or user['flow_state'] == number_verified):
         return "0"
     next_challenge_id = find_next_challenge_id(user)
     send_challenge_message(user, next_challenge_id)

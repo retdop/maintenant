@@ -3,7 +3,7 @@ from conf import session_key
 from new_challenge import send_new_challenge
 from update_collections import new_users
 from utils import update_flow_state, get_user, send_base_message, send_challenge_message
-from flow_states import feedback_asked, relance_asked, challenge_sent, verif_number, number_verified
+from flow_states import feedback_asked, relance_asked, challenge_sent, verif_number, number_verified, stopped
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 import re
@@ -150,6 +150,7 @@ def receive_verif_number_and_welcome(message, user):
 def unsubscribe(user):
     # This will never happen because twilio catches the STOP message before us!
     print('user {} {} wants to unsubscribe'.format(user['Prnom'], user['Nom']))
+    update_flow_state(user, stopped)
     return "OK"
 
 
@@ -159,12 +160,19 @@ def do_nothing(message, user):
     return 'OK'
 
 
+def receive_unsubscribed_users_message(message, user):
+    print('user {} {} is unsubscribed but sent a message'.format(user['Prnom'], user['Nom']))
+    print(message)
+    return 'OK'
+
+
 sms_dispatch = {
     feedback_asked: receive_note_and_ask_relance,
     relance_asked: receive_relance_and_send_challenge,
     challenge_sent: receive_response_and_continue,
     verif_number: receive_verif_number_and_welcome,
-    number_verified: do_nothing
+    number_verified: do_nothing,
+    stopped: receive_unsubscribed_users_message
 }
 
 if __name__ == "__main__":

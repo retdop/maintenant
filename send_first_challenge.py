@@ -15,7 +15,7 @@ def send_new_challenges():
 
 def send_new_challenge(user, bypass_flow_state=False):
     # send only to people with number_verified
-    if 'flow_state' in user and user['flow_state'] != number_verified and not bypass_flow_state:
+    if 'flow_state' in user and not user['flow_state'] == number_verified and not bypass_flow_state:
         return "0"
     next_challenge_id = find_next_challenge_id(user)
     send_challenge_message(user, next_challenge_id)

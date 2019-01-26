@@ -67,14 +67,16 @@ def get_user(phone_number):
     # this is ugly
     user = db.maintenant.users.find_one({'Tlphone': int(phone_number.replace(' ', '')[-9:])})
     if not user:
-        # try with spaces and leading zero
-        ten_digit = '0' + phone_number.replace(' ', '')[-9:]
-        spaces_number = ' '.join(a+b for a, b in zip(ten_digit[::2], ten_digit[1::2]))
-        user = db.maintenant.users.find_one({'Tlphone': spaces_number})
+        user = db.maintenant.users.find_one({'Tlphone': int(phone_number.replace(' ', '')[1:])})
         if not user:
-            # try with french indic code
-            # TODO: add other countries
-            user = db.maintenant.users.find_one({'Tlphone': int('33' + phone_number.replace(' ', '')[-9:])})
+            # try with spaces and leading zero
+            ten_digit = '0' + phone_number.replace(' ', '')[-9:]
+            spaces_number = ' '.join(a+b for a, b in zip(ten_digit[::2], ten_digit[1::2]))
+            user = db.maintenant.users.find_one({'Tlphone': spaces_number})
+            if not user:
+                # try with french indic code
+                # TODO: add other countries
+                user = db.maintenant.users.find_one({'Tlphone': int('33' + phone_number.replace(' ', '')[-9:])})
     return user
 
 
@@ -100,7 +102,16 @@ def verify_user(user):
 
 
 def make_nice_phone_number(phone_number):
-    return '+33' + str(phone_number).replace(' ', '')[-9:]
+    only_digits_phone_number = ''.join(i for i in str(phone_number) if i.isdigit())
+    if len(only_digits_phone_number) == 9:
+        return '+33' + only_digits_phone_number
+    elif len(only_digits_phone_number) > 10 and only_digits_phone_number[0] != '0':
+        return '+' + only_digits_phone_number
+    elif len(only_digits_phone_number) == 10 and only_digits_phone_number[0] == '0':
+        return '+33' + only_digits_phone_number[1:]
+    else:
+        print('There is a wrong phone number :', phone_number)
+        return only_digits_phone_number
 
 
 if __name__ == '__main__':

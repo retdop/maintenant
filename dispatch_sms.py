@@ -137,7 +137,7 @@ def receive_response_and_continue(message, user):
 
 def receive_verif_number_and_welcome(message, user):
     # flow_state : verif_number
-    verif_number_response = message.lower().replace(' ', '')
+    verif_number_response = ''.join(x for x in message if x.isalpha()).lower()
 
     if verif_number_response == 'oui':
         update_flow_state(user, number_verified)

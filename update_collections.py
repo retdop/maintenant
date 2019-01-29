@@ -1,10 +1,9 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from pymongo import UpdateOne
-from twilio.rest import Client
-from conf import account_sid, auth_token
 from utils import update_flow_state, send_message
 from database import db
+from flow_states import verif_number
 
 
 def get_spreadsheet_data(spreadsheet):

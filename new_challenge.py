@@ -42,7 +42,7 @@ def update_db_after_new_challenge(user, next_challenge_id):
 
 
 def find_next_challenge_id(user):
-    challenges = db.maintenant.results.find({})
+    challenges = db.maintenant.challenges.find({})
 
     user_results = db.maintenant.results.find({'user_id': user['_id']}).sort('date', -1)
     if user_results.count() == 0:

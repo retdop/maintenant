@@ -3,7 +3,7 @@ from conf import session_key
 from new_challenge import send_new_challenge
 from update_collections import new_users
 from utils import update_flow_state, get_user, send_base_message, send_challenge_message
-from flow_states import feedback_asked, relance_asked, challenge_sent, verif_number, number_verified, stopped
+from flow_states import feedback_asked, relance_asked, challenge_sent, verif_number, number_verified, stopped, all_done
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 import re

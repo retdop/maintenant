@@ -18,9 +18,10 @@ def send_new_challenge(user, bypass_flow_state=False):
     if 'flow_state' in user and not user['flow_state'] == number_verified and not bypass_flow_state:
         return "0"
     next_challenge_id = find_next_challenge_id(user)
-    send_challenge_message(user, next_challenge_id)
-    send_base_message(user, 'SMS11')
-    update_db_after_new_challenge(user, next_challenge_id)
+    if next_challenge_id:
+        send_challenge_message(user, next_challenge_id)
+        send_base_message(user, 'SMS11')
+        update_db_after_new_challenge(user, next_challenge_id)
     return "OK"
 
 

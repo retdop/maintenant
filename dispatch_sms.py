@@ -166,13 +166,20 @@ def receive_unsubscribed_users_message(message, user):
     return 'OK'
 
 
+def receive_all_done_users_message(message, user):
+    print('user {} {} has done all challenges but sent a message'.format(user['Prnom'], user['Nom']))
+    print(message)
+    return 'OK'
+
+
 sms_dispatch = {
     feedback_asked: receive_note_and_ask_relance,
     relance_asked: receive_relance_and_send_challenge,
     challenge_sent: receive_response_and_continue,
     verif_number: receive_verif_number_and_welcome,
     number_verified: do_nothing,
-    stopped: receive_unsubscribed_users_message
+    stopped: receive_unsubscribed_users_message,
+    all_done: receive_unsubscribed_users_message
 }
 
 if __name__ == "__main__":

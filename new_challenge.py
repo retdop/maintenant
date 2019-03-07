@@ -72,6 +72,7 @@ def find_next_challenge_id(user):
         last_challenge_id = 0
 
     try_next = True
+    second_loop = False
     next_challenge_id = last_challenge_id + 1
     while try_next:
         next_challenges = db.maintenant.results.find({'user_id': user['_id'], 'challenge_id': next_challenge_id}) \
@@ -83,8 +84,12 @@ def find_next_challenge_id(user):
         if next_challenge['relance'] == 1:
             return next_challenge_id
         next_challenge_id = next_challenge_id + 1
-        if next_challenge_id > challenges.count() + 1:
-            try_next = False
+        if next_challenge_id > challenges.count():
+            if not second_loop:
+                second_loop = True
+                next_challenge_id = 1
+            else:
+                try_next = False
 
     print("All challenges done for user {}".format(user['_id']))
 

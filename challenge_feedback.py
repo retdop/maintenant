@@ -11,7 +11,7 @@ def send_feedback_messages():
             if 'Batch' in user and user['Batch'] != 1 and user['Batch'] != 2:
                 send_base_message(user, 'SMS20')
                 update_collections_after_end_of_challenge(user)
-                sleep(5)
+                sleep(10)
 
 
 def update_collections_after_end_of_challenge(user):

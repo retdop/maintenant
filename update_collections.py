@@ -1,10 +1,10 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from pymongo import UpdateOne
+from pymongo import UpdateOne, InsertOne
 from utils import update_flow_state, send_message
 from database import db
 from flow_states import verif_number
-
+from datetime import datetime
 
 def get_spreadsheet_data(spreadsheet):
     scope = ['https://spreadsheets.google.com/feeds',
@@ -63,6 +63,21 @@ def welcoming_committee(tel):
     send_message(user, welcome_message['content'])
 
     update_flow_state(user, verif_number)
+
+
+def update_firsts_batches():
+    firsts_batches = list(db.maintenant['users'].find({'Batch': {'$ne': None}}))
+    firsts_ids = [user['_id'] for user in firsts_batches]
+    operations = [InsertOne({
+        'user_id': user_id,
+        'challenge_id': i+1,
+        'relance': 1,
+        'date': datetime.now(),
+        'state': 'done'
+    }) for user_id in firsts_ids for i in range(6)]
+    # print(operations)
+    result = db.maintenant['results'].bulk_write(operations)
+    print(result)
 
 
 if __name__ == '__main__':

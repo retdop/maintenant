@@ -8,10 +8,9 @@ def send_feedback_messages():
     users = db.maintenant.users.find({})
     for user in users:
         if 'flow_state' in user and user['flow_state'] == challenge_sent:
-            if 'Batch' in user and user['Batch'] != 1 and user['Batch'] != 2:
-                send_base_message(user, 'SMS20')
-                update_collections_after_end_of_challenge(user)
-                sleep(10)
+            send_base_message(user, 'SMS20')
+            update_collections_after_end_of_challenge(user)
+            sleep(10)
 
 
 def update_collections_after_end_of_challenge(user):

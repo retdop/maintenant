@@ -8,9 +8,8 @@ from time import sleep
 def send_new_challenges():
     users = db.maintenant.users.find({})
     for user in users:
-        if 'Batch' in user and user['Batch'] != 1 and user['Batch'] != 2:
-            send_new_challenge(user)
-            sleep(10)
+        send_new_challenge(user)
+        sleep(10)
 
 
 def send_new_challenge(user, bypass_flow_state=False):

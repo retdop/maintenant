@@ -77,9 +77,8 @@ def update_firsts_batches():
     }) for user_id in firsts_ids for i in range(6)]
     # print(operations)
     result = db.maintenant['results'].bulk_write(operations)
-    print(result)
+    print(result.bulk_api_result)
 
 
 if __name__ == '__main__':
-    # new_users()
     update_all_collections()

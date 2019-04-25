@@ -9,7 +9,6 @@ def send_new_challenges():
     users = db.maintenant.users.find({})
     for user in users:
         send_new_challenge(user)
-        sleep(10)
 
 
 def send_new_challenge(user, bypass_flow_state=False):
@@ -21,6 +20,7 @@ def send_new_challenge(user, bypass_flow_state=False):
         send_challenge_message(user, next_challenge_id)
         send_base_message(user, 'SMS11')
         update_db_after_new_challenge(user, next_challenge_id)
+        sleep(10)
     return "OK"
 
 

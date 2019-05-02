@@ -7,7 +7,7 @@ from time import sleep
 
 def send_new_challenges():
     users = db.maintenant.users.find({})
-    for user in users:
+    for user in list(users):
         send_new_challenge(user)
 
 

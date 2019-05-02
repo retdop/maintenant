@@ -6,7 +6,7 @@ from time import sleep
 
 def send_feedback_messages():
     users = db.maintenant.users.find({})
-    for user in users:
+    for user in list(users):
         if 'flow_state' in user and user['flow_state'] == challenge_sent:
             send_base_message(user, 'SMS20')
             update_collections_after_end_of_challenge(user)

@@ -110,3 +110,5 @@ venv.bak/
 Maintenant-co-18e27771f6d8.json
 conf.py
 nohup.out
+*.log
+*.err

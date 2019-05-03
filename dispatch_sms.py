@@ -43,7 +43,7 @@ def reception():
     user = get_user(user_number)
     if not user:
         return 'NOK'
-    if message.lower() == 'stop':
+    if ''.join(x for x in message if x.isalpha()).lower() == 'stop':
         return unsubscribe(user)
 
     return sms_dispatch[user['flow_state']](message, user)

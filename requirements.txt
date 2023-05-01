@@ -1,7 +1,7 @@
 requests
 twilio==6.19.2
 pymongo==3.7.2
-Flask==1.0.2
+Flask==2.3.2
 gspread==3.0.1
 sentry_sdk==0.5.5
 oauth2client==4.1.3
